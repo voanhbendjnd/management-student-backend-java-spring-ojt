@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     User findByEmailIgnoreCase(String email);
 
     /**
-     * get user by email when login with credential
+     * get user by email when login with credentials
      * 
      * @param email
      * @return optional user
