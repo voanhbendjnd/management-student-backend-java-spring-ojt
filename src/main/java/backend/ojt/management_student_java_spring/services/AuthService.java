@@ -25,9 +25,17 @@ public class AuthService {
     final PasswordEncoder passwordEncoder;
     final SessionManager sessionManager;
     final SecurityUtils securityUtils;
+    final StudentService studentService;
     @Value("${djnd.jwt.access-token-validity-in-seconds}")
     private Long expiresIn;
 
+    /**
+     * Student create account
+     * 
+     * @param request
+     * @return
+     **/
+    @Transactional
     public long register(RequestRegister request) {
         var user = this.userRepository.save(User.builder()
                 .email(request.getEmail())
@@ -38,6 +46,7 @@ public class AuthService {
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.STUDENT)
                 .build());
+        this.studentService.createStudent(user);
         return user.getId();
 
     }

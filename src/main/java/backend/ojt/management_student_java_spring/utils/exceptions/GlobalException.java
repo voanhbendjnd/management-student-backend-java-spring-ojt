@@ -71,4 +71,15 @@ public class GlobalException {
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
+
+    @ExceptionHandler(value = { DenyException.class })
+    public ResponseEntity<RestResponse<Object>> handleDenyException(DenyException ne) {
+        var statusCode = HttpStatus.UNAUTHORIZED.value();
+        var res = new RestResponse<>();
+        res.setStatusCode(statusCode);
+        res.setError("Not logged in!");
+        res.setMessage(ne.getMessage());
+        return ResponseEntity.status(statusCode).body(res);
+    }
+
 }
