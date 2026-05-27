@@ -39,7 +39,7 @@ public class Lecturer {
     @JoinColumn(name = "user_id")
     User user;
     @Column(unique = true, nullable = false)
-    String lectureCode;
+    String lecturerCode;
     @Enumerated(EnumType.STRING)
     LecturerDepartment department;
     @Enumerated(EnumType.STRING)

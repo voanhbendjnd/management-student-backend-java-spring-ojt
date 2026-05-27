@@ -1,7 +1,5 @@
 package backend.ojt.management_student_java_spring.controllers;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestStudent;
 import backend.ojt.management_student_java_spring.services.StudentService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
-import backend.ojt.management_student_java_spring.utils.constains.StudentMajor;
 import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

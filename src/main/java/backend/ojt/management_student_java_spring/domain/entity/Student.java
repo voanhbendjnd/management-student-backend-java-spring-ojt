@@ -43,4 +43,6 @@ public class Student {
     StudentMajor major;
     @OneToMany(mappedBy = "student")
     List<Enrollment> enrollments;
+    @Builder.Default
+    Integer countCredits = 0;
 }

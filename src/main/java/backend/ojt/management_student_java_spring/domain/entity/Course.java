@@ -1,5 +1,6 @@
 package backend.ojt.management_student_java_spring.domain.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
@@ -52,4 +53,8 @@ public class Course extends BaseEntity {
     List<Enrollment> enrollments;
     @Version
     Long version;
+    @Column(nullable = false)
+    LocalDateTime enrollStartDate;
+    @Column(nullable = false)
+    LocalDateTime enrollEndDate;
 }
