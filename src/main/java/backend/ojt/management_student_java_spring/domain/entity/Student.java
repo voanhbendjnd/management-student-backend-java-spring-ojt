@@ -38,7 +38,6 @@ public class Student extends AuditEntity {
     @MapsId
     User user;
     @Column(unique = true, nullable = false)
-
     String studentCode;
     @Enumerated(EnumType.STRING)
     StudentMajor major;

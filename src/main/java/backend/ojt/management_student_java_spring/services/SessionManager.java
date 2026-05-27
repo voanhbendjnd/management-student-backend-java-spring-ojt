@@ -8,11 +8,11 @@ import backend.ojt.management_student_java_spring.domain.entity.User;
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
 /*
  * Manage session account
  */
+@Service
+@RequiredArgsConstructor
 public class SessionManager {
     private final UserRepository userRepository;
 
