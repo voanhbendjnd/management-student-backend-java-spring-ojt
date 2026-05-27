@@ -31,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Lecturer extends AuditEntity {
+public class Lecturer {
     @Id
     Long userId;
     @OneToOne(fetch = FetchType.LAZY)
