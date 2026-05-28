@@ -1,0 +1,74 @@
+package backend.ojt.management_student_java_spring.domain.dto.res;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ResReportEnroll {
+    @JsonProperty("course_id")
+    Long courseId;
+    @JsonProperty("course_name")
+    String courseName;
+    @JsonProperty("course_code")
+    String courseCode;
+    @JsonProperty("max_students")
+    Integer maxStudents;
+    @JsonProperty("current_students")
+    Integer currentStudents;
+    LecturerInfo lecturer;
+    @JsonProperty("enroll_start_date")
+    LocalDateTime enrollStartDate;
+    @JsonProperty("enroll_end_date")
+    LocalDateTime enrollEndDate;
+    Pagination pagination;
+
+    List<StudentEnrollment> enrollments;
+
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class StudentEnrollment {
+        @JsonProperty("student_id")
+        Long studentId;
+        @JsonProperty("student_name")
+        String studentName;
+        @JsonProperty("student_code")
+        String studentCode;
+        @JsonProperty("student_email")
+        String studentEmail;
+        EnrollmentStatus status;
+        @JsonProperty("enroll_at")
+        LocalDateTime enrollAt;
+    }
+
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class LecturerInfo {
+        Long id;
+        String code;
+        String name;
+        String email;
+    }
+
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class Pagination {
+        int page;
+        int pageSize;
+        long total;
+        int pages;
+    }
+
+}

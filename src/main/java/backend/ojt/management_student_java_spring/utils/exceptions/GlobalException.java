@@ -93,8 +93,8 @@ public class GlobalException {
      * @param ne
      * @return http status code 403
      **/
-    @ExceptionHandler(value = { UnthorizedException.class })
-    public ResponseEntity<RestResponse<Object>> handleDenyException(UnthorizedException ne) {
+    @ExceptionHandler(value = { UnauthorizedException.class })
+    public ResponseEntity<RestResponse<Object>> handleDenyException(UnauthorizedException ne) {
         var statusCode = HttpStatus.UNAUTHORIZED.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
@@ -109,8 +109,8 @@ public class GlobalException {
      * @param ne
      * @return
      **/
-    @ExceptionHandler(value = { AccessToResourseException.class })
-    public ResponseEntity<RestResponse<Object>> handleAccessToResourcesException(AccessToResourseException ne) {
+    @ExceptionHandler(value = { AccessToResourceException.class })
+    public ResponseEntity<RestResponse<Object>> handleAccessToResourcesException(AccessToResourceException ne) {
         var statusCode = HttpStatus.FORBIDDEN.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);

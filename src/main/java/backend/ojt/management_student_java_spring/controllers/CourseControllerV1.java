@@ -1,9 +1,11 @@
 package backend.ojt.management_student_java_spring.controllers;
 
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,11 +41,13 @@ public class CourseControllerV1 {
     @PostMapping("/{id}/enroll")
     @ApiMessage("Enrollment course")
     public ResponseEntity<String> enroll(@Positive @PathVariable("id") Long courseId) {
-        try {
-            this.enrollmentService.enroll(courseId);
-            return ResponseEntity.ok("Enroll successfully!");
-        } catch (NumberFormatException ne) {
-            throw new BadDataException("Course ID must be number!");
-        }
+        this.enrollmentService.enroll(courseId);
+        return ResponseEntity.ok("Enroll successfully!");
+    }
+
+    @GetMapping("/{id}/enroll/report")
+    @ApiMessage("Get report course enroll")
+    public ResponseEntity<?> report(@Positive @PathVariable("id") Long courseId, Pageable pageable) {
+        return ResponseEntity.ok(this.enrollmentService.report(courseId, pageable));
     }
 }

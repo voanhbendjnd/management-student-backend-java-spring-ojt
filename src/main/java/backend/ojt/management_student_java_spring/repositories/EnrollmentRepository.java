@@ -1,11 +1,15 @@
 package backend.ojt.management_student_java_spring.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import backend.ojt.management_student_java_spring.domain.dto.res.StudentEnrollmentProjection;
+import backend.ojt.management_student_java_spring.domain.dto.res.ResReportEnroll.StudentEnrollment;
 import backend.ojt.management_student_java_spring.domain.entity.Enrollment;
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
@@ -40,4 +44,15 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
             @Param("year") Integer year,
             @Param("enrollStatus") EnrollmentStatus enrollStatus);
 
+    @Query(value = """
+            select u.id as studentId, u.name as studentName, u.email as studentEmail,
+                    s.studentCode as studentCode, e.status as status,
+                            e.createdAt as enrollAt
+            from Enrollment e
+            join e.student s
+            join s.user u
+            where e.course.id = :courseId and e.status = :status
+            """)
+    Page<StudentEnrollmentProjection> findStudentEnrollmentByCourseId(@Param("courseId") Long courseId,
+            @Param("status") EnrollmentStatus status, Pageable pageable);
 }
