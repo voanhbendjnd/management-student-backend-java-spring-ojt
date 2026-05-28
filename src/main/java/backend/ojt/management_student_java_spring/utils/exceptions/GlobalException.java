@@ -13,9 +13,12 @@ import backend.ojt.management_student_java_spring.domain.dto.res.RestResponse;
 
 @RestControllerAdvice
 public class GlobalException {
-    /*
-     * Handle exception for resource not found
-     */
+    /**
+     * handle resource not found
+     * 
+     * @param ne
+     * @return http status code 404
+     **/
     @ExceptionHandler(value = { NotFoundException.class })
     public ResponseEntity<RestResponse<Object>> handleNotFoundException(NotFoundException ne) {
         var statusCode = HttpStatus.NOT_FOUND.value();
@@ -26,9 +29,12 @@ public class GlobalException {
         return ResponseEntity.status(statusCode).body(res);
     }
 
-    /*
-     * Handle exception for server confict
-     */
+    /**
+     * handle conflict
+     * 
+     * @param ne
+     * @return http status code 409
+     **/
     @ExceptionHandler(value = { ConflictException.class })
     public ResponseEntity<RestResponse<Object>> handleConflictException(ConflictException ne) {
         var statusCode = HttpStatus.CONFLICT.value();
@@ -39,6 +45,12 @@ public class GlobalException {
         return ResponseEntity.status(statusCode).body(res);
     }
 
+    /**
+     * bad request
+     * 
+     * @param ne
+     * @return http status code 400
+     **/
     @ExceptionHandler(value = { BadDataException.class })
     public ResponseEntity<RestResponse<Object>> handleBadDateException(BadDataException ne) {
         var statusCode = HttpStatus.BAD_REQUEST.value();
@@ -49,9 +61,12 @@ public class GlobalException {
         return ResponseEntity.status(statusCode).body(res);
     }
 
-    /*
+    /**
      * Handle exception for valid request
-     */
+     * 
+     * @param ex
+     * @return bad request 400
+     **/
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RestResponse<Object>> handleValidation(
             MethodArgumentNotValidException ex) {
@@ -72,12 +87,34 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    @ExceptionHandler(value = { DenyException.class })
-    public ResponseEntity<RestResponse<Object>> handleDenyException(DenyException ne) {
+    /**
+     * hanlde case when user not logined
+     * 
+     * @param ne
+     * @return http status code 403
+     **/
+    @ExceptionHandler(value = { UnthorizedException.class })
+    public ResponseEntity<RestResponse<Object>> handleDenyException(UnthorizedException ne) {
         var statusCode = HttpStatus.UNAUTHORIZED.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
         res.setError("Not logged in!");
+        res.setMessage(ne.getMessage());
+        return ResponseEntity.status(statusCode).body(res);
+    }
+
+    /**
+     * handle error logined but, do have not permission
+     * 
+     * @param ne
+     * @return
+     **/
+    @ExceptionHandler(value = { AccessToResourseException.class })
+    public ResponseEntity<RestResponse<Object>> handleAccessToResourcesException(AccessToResourseException ne) {
+        var statusCode = HttpStatus.FORBIDDEN.value();
+        var res = new RestResponse<>();
+        res.setStatusCode(statusCode);
+        res.setError("You do not have permission!");
         res.setMessage(ne.getMessage());
         return ResponseEntity.status(statusCode).body(res);
     }

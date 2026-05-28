@@ -13,8 +13,9 @@ import backend.ojt.management_student_java_spring.repositories.StudentRepository
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
+import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourseException;
 import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
-import backend.ojt.management_student_java_spring.utils.exceptions.DenyException;
+import backend.ojt.management_student_java_spring.utils.exceptions.UnthorizedException;
 import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,13 +39,13 @@ public class EnrollmentService {
         // student account must exist
         var userId = SecurityUtils.getCurrentUserIdOrNull();
         if (userId == null) {
-            throw new DenyException("Students are not logged in!");
+            throw new UnthorizedException("Students are not logged in!");
         }
         var student = this.studentRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Student not found!"));
         // account student active
         if (student.getUser().getStatus() != UserStatus.ACTIVE) {
-            throw new DenyException("Student account inactive!");
+            throw new AccessToResourseException("Student account inactive!");
         }
         // course must exist
         var course = this.courseRepository.findById(courseId)
@@ -57,7 +58,7 @@ public class EnrollmentService {
         // deadline enroll
         var now = LocalDateTime.now();
         if (now.isAfter(course.getEnrollEndDate())) {
-            throw new DenyException("The course registration deadline has passed!");
+            throw new AccessToResourseException("The course registration deadline has passed!");
         }
         // check slot available
         if (course.getCurrentStudents() >= course.getMaxStudents()) {
@@ -67,7 +68,7 @@ public class EnrollmentService {
         int totalCredits = this.enrollmentRepository.totalCredits(userId, course.getSemester(), course.getYear(),
                 EnrollmentStatus.ENROLLED);
         if (totalCredits + course.getCredits() >= 18) {
-            throw new DenyException(
+            throw new AccessToResourseException(
                     "Maximum 18 credits per semester!");
         }
         // save enroll
@@ -80,7 +81,7 @@ public class EnrollmentService {
             // concurrent
             var updated = this.courseRepository.updateSlotStudents(courseId, course.getVersion());
             if (updated <= 0) {
-                throw new DenyException("Course is full!");
+                throw new AccessToResourseException("Course is full!");
             }
         } catch (DataIntegrityViolationException ex) {
             throw new BadDataException("Already enrolled!");
