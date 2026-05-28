@@ -38,7 +38,7 @@ public class AuthService {
     @Transactional
     public long register(RequestRegister request) {
         var user = this.userRepository.save(User.builder()
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase())
                 .gender(request.getGender())
                 .name(request.getName())
                 .password(this.passwordEncoder.encode(request.getConfirmPassword()))

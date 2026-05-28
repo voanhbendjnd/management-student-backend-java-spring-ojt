@@ -1,17 +1,40 @@
 package backend.ojt.management_student_java_spring.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.io.IOException;
+import java.util.zip.DataFormatException;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import backend.ojt.management_student_java_spring.domain.dto.res.ResImportUser;
+import backend.ojt.management_student_java_spring.services.UserService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserControllerV1 {
-    @GetMapping
-    public String testHello() {
-        return "DJND say hi";
+    final UserService userService;
+
+    /**
+     * import user sush as lecturer, student from excel file (.xlsx)
+     * 
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws DataFormatException
+     **/
+    @PostMapping("/import")
+    public ResponseEntity<ResImportUser> importUsers(@RequestPart("file") MultipartFile file)
+            throws IOException, DataFormatException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.importUsers(file));
     }
 }

@@ -3,6 +3,7 @@ package backend.ojt.management_student_java_spring.domain.dto.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
+import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -31,5 +32,6 @@ public class RequestRegister extends RequestAccount {
     @JsonProperty(value = "confirm_password")
     @NotNull(message = "Confirm password empty!")
     String confirmPassword;
+    UserRole role;
 
 }

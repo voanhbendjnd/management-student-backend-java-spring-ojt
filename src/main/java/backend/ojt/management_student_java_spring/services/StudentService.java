@@ -23,19 +23,29 @@ public class StudentService {
     final StudentRepository studentRepository;
 
     /**
+     * init student code
+     * 
+     * @param user
+     **/
+    public String generateStudentCode(Long userId) {
+        String year = String.format("%02d",
+                LocalDateTime.now().getYear() % 100);
+        String studentCode = "S"
+                + year
+                + String.format("%06d", userId);
+        return studentCode;
+    }
+
+    /**
      * init student when register account
      * 
      * @param user
      **/
     public void createStudent(User user) {
-        String year = String.format("%02d",
-                LocalDateTime.now().getYear() % 100);
-        String studentCode = "S"
-                + year
-                + String.format("%06d", user.getId());
+
         this.studentRepository.save(
                 Student.builder()
-                        .studentCode(studentCode)
+                        .studentCode(this.generateStudentCode(user.getId()))
                         .user(user)
                         .build());
     }
