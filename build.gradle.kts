@@ -42,6 +42,9 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
 	// valid attribute
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	// excel file
+	implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
 
 }
 

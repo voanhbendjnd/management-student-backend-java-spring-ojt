@@ -10,7 +10,7 @@ import backend.ojt.management_student_java_spring.domain.entity.User;
 import backend.ojt.management_student_java_spring.repositories.StudentRepository;
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
 import backend.ojt.management_student_java_spring.utils.constains.StudentMajor;
-import backend.ojt.management_student_java_spring.utils.exceptions.DenyException;
+import backend.ojt.management_student_java_spring.utils.exceptions.UnthorizedException;
 import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class StudentService {
     public void registerMajor(StudentMajor major) {
         var userId = SecurityUtils.getCurrentUserIdOrNull();
         if (userId == null) {
-            throw new DenyException("Not logged in!");
+            throw new UnthorizedException("Not logged in!");
         }
         int updated = this.studentRepository.updateMajorStudentById(userId, major);
         if (updated <= 0) {
