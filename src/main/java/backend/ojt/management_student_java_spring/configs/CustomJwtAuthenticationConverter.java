@@ -13,9 +13,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-/*
-* check token valid
-*/
+/**
+ * check token valid
+ * check session invalid
+ * convert role JWT to security permission
+ * active in Security config
+ * output: list authorities for user role
+ * accept decode jwt-> return list authorize
+ **/
 @Component
 public class CustomJwtAuthenticationConverter
         implements Converter<Jwt, Collection<GrantedAuthority>> {

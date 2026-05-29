@@ -1,5 +1,5 @@
 ** Dự án quản lý sinh viên với mục tiêu tối ưu hiệu năng khi nhiều sinh viên đăng kí môn học đồng thời
-** Kiến trúc dự án dụng là Domain Driven Design (DDD)
+** Domain Driven Design (DDD)
 
 ** Tên hàm tên phương thức đều phải là tiếng anh
 ** Sao khi code nếu được thì comment giải thích cái phương thức đó làm gì ở trên hàm, có thể comment tiếng việt, anh,...

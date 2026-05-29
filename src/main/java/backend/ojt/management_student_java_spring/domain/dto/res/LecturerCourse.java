@@ -2,6 +2,8 @@ package backend.ojt.management_student_java_spring.domain.dto.res;
 
 import java.time.LocalDateTime;
 
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
+
 public interface LecturerCourse {
     Long getId();
 
@@ -24,4 +26,6 @@ public interface LecturerCourse {
     String getLecturerCode();
 
     String getLecturerEmail();
+
+    UserGender getLecturerGender();
 }

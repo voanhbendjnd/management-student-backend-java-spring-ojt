@@ -114,7 +114,7 @@ public class GlobalException {
         var statusCode = HttpStatus.FORBIDDEN.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
-        res.setError("You do not have permission!");
+        res.setError("Forbidden");
         res.setMessage(ne.getMessage());
         return ResponseEntity.status(statusCode).body(res);
     }

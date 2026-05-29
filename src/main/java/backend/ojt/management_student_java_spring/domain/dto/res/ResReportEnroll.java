@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +47,7 @@ public class ResReportEnroll {
         String studentCode;
         @JsonProperty("student_email")
         String studentEmail;
+        UserGender gender;
         EnrollmentStatus status;
         @JsonProperty("enroll_at")
         LocalDateTime enrollAt;
@@ -59,6 +61,7 @@ public class ResReportEnroll {
         String code;
         String name;
         String email;
+        UserGender gender;
     }
 
     @Getter

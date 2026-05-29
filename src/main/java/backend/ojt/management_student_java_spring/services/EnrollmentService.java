@@ -106,6 +106,13 @@ public class EnrollmentService {
 
     }
 
+    /**
+     * report student enroll course by ID
+     * 
+     * @param courseId
+     * @param pageable
+     * @return
+     **/
     public ResReportEnroll report(Long courseId, Pageable pageable) {
         var userId = SecurityUtils.getCurrentUserIdOrNull();
         if (userId == null) {
@@ -119,6 +126,14 @@ public class EnrollmentService {
 
     }
 
+    /**
+     * view the report if you are a lecturer or administrator
+     * 
+     * @param user
+     * @param courseId
+     * @param pageable
+     * @return
+     **/
     private ResReportEnroll getReportForAuthorizedUser(User user, Long courseId, Pageable pageable) {
         var lecturerCourse = this.courseRepository.findResLecturerCourseById(courseId)
                 .orElseThrow(() -> new NotFoundException("Course not found!"));
@@ -129,9 +144,17 @@ public class EnrollmentService {
 
     }
 
+    /**
+     * covert to report enrollment
+     * 
+     * @param lecturerCourse
+     * @param pageable
+     * @return
+     **/
     private ResReportEnroll toResReport(LecturerCourse lecturerCourse,
             Pageable pageable) {
         var res = new ResReportEnroll();
+        // course
         res.setCourseCode(lecturerCourse.getCourseCode());
         res.setCourseId(lecturerCourse.getId());
         res.setCourseName(lecturerCourse.getName());
@@ -139,12 +162,15 @@ public class EnrollmentService {
         res.setMaxStudents(lecturerCourse.getMaxStudents());
         res.setEnrollStartDate(lecturerCourse.getEnrollStartDate());
         res.setEnrollEndDate(lecturerCourse.getEnrollEndDate());
+        // lecturer info
         var lecturerInfor = new ResReportEnroll.LecturerInfo();
         lecturerInfor.setCode(lecturerCourse.getLecturerCode());
         lecturerInfor.setId(lecturerCourse.getLecturerId());
         lecturerInfor.setEmail(lecturerCourse.getLecturerEmail());
         lecturerInfor.setName(lecturerCourse.getLecturerName());
+        lecturerInfor.setGender(lecturerCourse.getLecturerGender());
         res.setLecturer(lecturerInfor);
+        // student enrolled
         var page = this.enrollmentRepository.findStudentEnrollmentByCourseId(lecturerCourse.getId(),
                 EnrollmentStatus.ENROLLED,
                 pageable);
@@ -153,6 +179,13 @@ public class EnrollmentService {
         return res;
     }
 
+    /**
+     * convert to pagination student enrollment at response report
+     * 
+     * @param pageable
+     * @param page
+     * @return
+     **/
     private ResReportEnroll.Pagination toPaginationResReport(Pageable pageable,
             Page<StudentEnrollmentProjection> page) {
 
@@ -164,10 +197,17 @@ public class EnrollmentService {
         return pagination;
     }
 
+    /**
+     * convert to student enrollment
+     * 
+     * @param se
+     * @return
+     **/
     private ResReportEnroll.StudentEnrollment toStudentEnrollment(StudentEnrollmentProjection se) {
         var res = new ResReportEnroll.StudentEnrollment();
         res.setEnrollAt(se.getEnrollAt());
         res.setStatus(se.getStatus());
+        res.setGender(se.getGender());
         res.setStudentCode(se.getStudentCode());
         res.setStudentEmail(se.getStudentEmail());
         res.setStudentId(se.getStudentId());

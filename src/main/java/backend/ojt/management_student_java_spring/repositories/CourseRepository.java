@@ -47,6 +47,7 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
                         select c.id as id, c.name as name, c.courseCode as courseCode,
                                         c.currentStudents as currentStudents, c.maxStudents as maxStudents,
                                                         c.enrollStartDate as enrollStartDate, c.enrollEndDate as enrollEndDate,
+                                                                        u.gender as lecturerGender,
                                                                         u.id as lecturerId, u.name as lecturerName, l.lecturerCode as lecturerCode, u.email as lecturerEmail
                                                         from Course c
                         join c.lecturer l

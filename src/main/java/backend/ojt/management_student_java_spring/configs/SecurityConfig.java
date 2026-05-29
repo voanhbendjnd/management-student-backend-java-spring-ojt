@@ -31,8 +31,9 @@ import backend.ojt.management_student_java_spring.utils.SecurityUtils;
 */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true) // PreAuthorze or Secured
 public class SecurityConfig {
+    // secret key
     @Value("${djnd.jwt.base64-secret}")
     private String jwtKey;
 
@@ -58,7 +59,7 @@ public class SecurityConfig {
 
         http
                 .cors(cors -> cors.configurationSource(corsConfig))
-                .csrf(c -> c.disable())
+                .csrf(c -> c.disable()) // disable session cookie cause use JWT stateless
 
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(whiteList).permitAll()
@@ -71,46 +72,77 @@ public class SecurityConfig {
                                         jwtAuthenticationConverter(customConverter))))
 
                 .formLogin(f -> f.disable())
-
+                // not save session, user login
+                // any request included JWT
+                // jwt included info user
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
 
+    /**
+     * init JWT: jwtEncoder.encode
+     * 
+     * @return
+     **/
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
     }
 
+    /**
+     * convert base64 -> secret key
+     * 
+     * @return
+     **/
     private SecretKey getSecretKey() {
+        // decode base 64
         byte[] keyBytes = Base64.from(jwtKey).decode();
+        // create object key with al HMAC
         return new SecretKeySpec(keyBytes, 0, keyBytes.length,
                 SecurityUtils.JWT_ALGORITHM.getName());
     }
 
+    /**
+     * verify JwtDecoder
+     * signature
+     * token fixed ?
+     * token valid ?
+     * 
+     * @return
+     **/
     @Bean
     public JwtDecoder jwtDecoder() {
+        // al HS256
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(getSecretKey())
                 .macAlgorithm(SecurityUtils.JWT_ALGORITHM).build();
         return token -> {
             try {
-                // Nếu token là "undefined" hoặc rác, ném lỗi để
-                // Spring Security biết đây không phải là một nỗ lực login hợp lệ
+                // nếu token là "undefined" hoặc rác, ném lỗi để
+                // spring Security biết đây không phải là một nỗ lực login hợp lệ
                 return jwtDecoder.decode(token);
             } catch (Exception ex) {
-                // Log lỗi để debug nhưng hệ thống sẽ hiểu là Unauthenticated
+                // unauthenticated
                 System.out.println(">>> JWT Error: " + ex.getMessage());
                 throw ex;
             }
         };
     }
 
+    /**
+     * convert JWT claims -> Authentication object (Authories)
+     * ex: {"sub": "1", "role": "ADMIN"} -> ROLE_ADMIN
+     * use for hasRole("...")
+     * 
+     * @param customConverter
+     * @return
+     **/
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter(
             CustomJwtAuthenticationConverter customConverter) {
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-
+        // convert and check role
         jwtAuthenticationConverter
                 .setJwtGrantedAuthoritiesConverter(customConverter);
 
