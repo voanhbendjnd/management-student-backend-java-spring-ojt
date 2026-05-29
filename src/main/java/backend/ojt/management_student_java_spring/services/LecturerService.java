@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import backend.ojt.management_student_java_spring.domain.dto.request.RequestUserInfo;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResultPagination;
@@ -13,15 +14,15 @@ import backend.ojt.management_student_java_spring.domain.entity.Lecturer;
 import backend.ojt.management_student_java_spring.domain.entity.User;
 import backend.ojt.management_student_java_spring.repositories.CourseRepository;
 import backend.ojt.management_student_java_spring.repositories.LecturerRepository;
-import backend.ojt.management_student_java_spring.utils.SecurityUtils;
+import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerAcademicTitle;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerDepartment;
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
 import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
-import backend.ojt.management_student_java_spring.utils.exceptions.UnauthorizedException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +33,7 @@ import lombok.experimental.FieldDefaults;
 public class LecturerService {
         final LecturerRepository lecturerRepository;
         final CourseRepository courseRepository;
+        final UserRepository userRepository;
 
         /**
          * init lecturer code
@@ -67,11 +69,7 @@ public class LecturerService {
          **/
         @Transactional
         public void registerInfoLecturer(RequestLecturer requestLecturer) {
-                var lecturerId = SecurityUtils.getCurrentUserIdOrNull();
-                if (lecturerId == null) {
-                        throw new UnauthorizedException("Not logged in!");
-                }
-                var lecturer = this.lecturerRepository.findWithDetailById(lecturerId)
+                var lecturer = this.lecturerRepository.findWithDetailById(requestLecturer.id())
                                 .orElseThrow(() -> new ResourceNotFoundException("Lecturer not found!"));
                 if (lecturer.getUser().getStatus().equals(UserStatus.INACTIVE)) {
                         throw new AccessToResourceException("You do not have permission!");
@@ -153,6 +151,33 @@ public class LecturerService {
                 } else {
                         this.lecturerRepository.delete(lecturer);
                 }
+        }
+
+        /**
+         * update base info lecturer such as name, phone, gender
+         * 
+         * @param request
+         **/
+        public void updateInfoLecturer(RequestUserInfo request) {
+                var lecturer = this.userRepository.findById(request.getId())
+                                .orElseThrow(() -> new ResourceNotFoundException("Lecturer not found!"));
+                if (!lecturer.getRole().equals(UserRole.LECTURER)) {
+                        throw new AccessToResourceException("You do not have permission!");
+                }
+                if (lecturer.getStatus().equals(UserStatus.INACTIVE)) {
+                        throw new AccessToResourceException("You do not have permission!");
+
+                }
+                if (request.getGender() != null) {
+                        lecturer.setGender(UserGender.valueOf(request.getGender()));
+                }
+                if (request.getName() != null && !request.getName().isBlank()) {
+                        lecturer.setName(request.getName());
+                }
+                if (request.getPhone() != null && !request.getPhone().isBlank()) {
+                        lecturer.setPhone(request.getPhone());
+                }
+                this.userRepository.save(lecturer);
         }
 
 }

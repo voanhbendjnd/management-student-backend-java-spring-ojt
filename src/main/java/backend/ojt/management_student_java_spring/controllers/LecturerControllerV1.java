@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
+import backend.ojt.management_student_java_spring.domain.dto.request.RequestUserInfo;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResultPagination;
 import backend.ojt.management_student_java_spring.services.LecturerService;
@@ -23,6 +24,7 @@ import backend.ojt.management_student_java_spring.services.UserService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerAcademicTitle;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerDepartment;
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -60,10 +62,10 @@ public class LecturerControllerV1 {
      * @param request
      * @return
      **/
-    @PreAuthorize("hasRole('LECTURER')")
-    @PatchMapping("/me/information")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/skill")
     @ApiMessage("Update academic or department")
-    public ResponseEntity<?> updateCoreLecturer(@RequestBody RequestLecturer request) {
+    public ResponseEntity<?> updateCoreLecturer(@Valid @RequestBody RequestLecturer request) {
         if (request.academicTitle() != null) {
             try {
                 LecturerAcademicTitle.valueOf(request.academicTitle());
@@ -79,7 +81,7 @@ public class LecturerControllerV1 {
             }
         }
         this.lecturerService.registerInfoLecturer(request);
-        return ResponseEntity.ok("Update lecturer successfully!");
+        return ResponseEntity.ok("Update skill lecturer successfully!");
     }
 
     /**
@@ -119,5 +121,26 @@ public class LecturerControllerV1 {
     public ResponseEntity<?> delete(@Positive @PathVariable("id") Long id) {
         this.lecturerService.deleteById(id);
         return ResponseEntity.ok("Delete lecturer successfully!");
+    }
+
+    /**
+     * update name, phone, gender lecturer
+     * 
+     * @param request
+     * @return
+     **/
+    @PreAuthorize("hasAnyRole('ADMIN', 'LECTURER')")
+    @PatchMapping
+    @ApiMessage("Update infor lecturer")
+    public ResponseEntity<?> updateInfoLecturer(@Valid @RequestBody RequestUserInfo request) {
+        if (request.getGender() != null) {
+            try {
+                UserGender.valueOf(request.getGender());
+            } catch (Exception ex) {
+                throw new RequestErrorException("Gender invalid format");
+            }
+        }
+        this.lecturerService.updateInfoLecturer(request);
+        return ResponseEntity.ok("Update info lecturer successfully!");
     }
 }
