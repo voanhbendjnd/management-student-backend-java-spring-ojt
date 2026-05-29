@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestStudent;
 import backend.ojt.management_student_java_spring.services.StudentService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
-import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +28,7 @@ public class StudentControllerV1 {
     public ResponseEntity<?> registerMajor(@RequestBody RequestStudent request) {
         var major = request.getMajor();
         if (major == null) {
-            throw new BadDataException("Major null!");
+            throw new RequestDataException("Major null!");
         }
         this.studentService.registerMajor(major);
         return ResponseEntity.ok("Register major successfully!");

@@ -30,7 +30,7 @@ import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
-import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
 import backend.ojt.management_student_java_spring.utils.regex.UserRegex;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class UserService {
     @Transactional
     public ResImportUser importUsers(MultipartFile file) throws IOException, DataFormatException {
         if (file.getOriginalFilename() == null || !file.getOriginalFilename().endsWith(".xlsx")) {
-            throw new BadDataException("File invalid, type file must be .xlsx");
+            throw new RequestDataException("File invalid, type file must be .xlsx");
         }
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             var sheet = workbook.getSheetAt(0);

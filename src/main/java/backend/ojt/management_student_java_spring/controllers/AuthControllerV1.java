@@ -17,7 +17,7 @@ import backend.ojt.management_student_java_spring.domain.dto.request.RequestAcco
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
 import backend.ojt.management_student_java_spring.services.AuthService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
-import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class AuthControllerV1 {
         if (requestRegister.getConfirmPassword().equals(requestRegister.getConfirmPassword())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(this.authService.register(requestRegister));
         }
-        throw new BadDataException("Password and confirm password are not same thing");
+        throw new RequestDataException("Password and confirm password are not same thing");
     }
 
     /**

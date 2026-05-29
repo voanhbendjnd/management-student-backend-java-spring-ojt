@@ -22,6 +22,12 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
         @Query(value = "select c from Course c where c.id = :courseId")
         Optional<Course> findWithDetailById(@Param("courseId") Long courseId);
 
+        /**
+         * get response data with course ID
+         * 
+         * @param courseId
+         * @return
+         **/
         @Query(value = """
                         select c.id as id, c.name as name, c.description as description,
                                 c.courseCode as courseCode,
@@ -38,11 +44,24 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
                         """)
         Optional<ResCourse> findResById(@Param("courseId") Long courseId);
 
+        /**
+         * update course student enrollment
+         * 
+         * @param courseId
+         * @param version
+         * @return
+         **/
         @Modifying
         @Query(value = "update Course c set c.currentStudents = c.currentStudents + 1, c.version = c.version + 1 where c.id = :courseId and c.currentStudents < c.maxStudents and c.version = :version")
         Integer updateSlotStudents(@Param("courseId") Long courseId,
                         @Param("version") Long version);
 
+        /**
+         * find data for report lecturer manage course
+         * 
+         * @param courseId
+         * @return
+         **/
         @Query(value = """
                         select c.id as id, c.name as name, c.courseCode as courseCode,
                                         c.currentStudents as currentStudents, c.maxStudents as maxStudents,

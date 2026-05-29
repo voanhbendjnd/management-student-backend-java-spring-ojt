@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import backend.ojt.management_student_java_spring.domain.dto.res.StudentEnrollmentProjection;
-import backend.ojt.management_student_java_spring.domain.dto.res.ResReportEnroll.StudentEnrollment;
 import backend.ojt.management_student_java_spring.domain.entity.Enrollment;
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
@@ -44,6 +43,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
                         @Param("year") Integer year,
                         @Param("enrollStatus") EnrollmentStatus enrollStatus);
 
+        /**
+         * get student enrollment with pagination
+         * 
+         * @param courseId
+         * @param status
+         * @param pageable
+         * @return
+         **/
         @Query(value = """
                         select u.id as studentId, u.name as studentName, u.email as studentEmail,
                                 s.studentCode as studentCode, e.status as status,

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,11 +31,7 @@ public class RequestCourse {
     @Min(value = 1, message = "Max students must be greater than 0")
     @JsonProperty(value = "max_students")
     Integer maxStudents;
-    @NotNull(message = "Semester null!")
     CourseSemester semester;
-    @NotNull(message = "Year null!")
-    @Min(value = 2000)
-    @Max(value = 2100)
     Integer year;
     @JsonProperty("lecturer_id")
     Long lecturerId;

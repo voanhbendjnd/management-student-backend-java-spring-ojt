@@ -5,6 +5,7 @@ import java.util.zip.DataFormatException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -32,6 +33,8 @@ public class UserControllerV1 {
      * @throws IOException
      * @throws DataFormatException
      **/
+    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("/import")
     public ResponseEntity<ResImportUser> importUsers(@RequestPart("file") MultipartFile file)
             throws IOException, DataFormatException {

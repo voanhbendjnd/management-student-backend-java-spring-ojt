@@ -15,10 +15,23 @@ import backend.ojt.management_student_java_spring.utils.constains.StudentMajor;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
+    /**
+     * update major student
+     * 
+     * @param studentId
+     * @param major
+     * @return
+     **/
     @Modifying
     @Query(value = "update Student s set s.major = :major where s.id = :studentId")
     int updateMajorStudentById(@Param("studentId") Long studentId, @Param("major") StudentMajor major);
 
+    /**
+     * get student and user
+     * 
+     * @param studentId
+     * @return
+     **/
     @EntityGraph(attributePaths = { "user" })
     @Query(value = "select s from Student s where s.id = :studentId")
     Optional<Student> findWithDetailById(@Param("studentId") Long studentId);

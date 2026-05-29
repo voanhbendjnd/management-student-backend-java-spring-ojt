@@ -1,6 +1,5 @@
 package backend.ojt.management_student_java_spring.domain.dto.res;
 
-import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

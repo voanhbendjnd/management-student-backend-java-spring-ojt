@@ -51,8 +51,8 @@ public class GlobalException {
      * @param ne
      * @return http status code 400
      **/
-    @ExceptionHandler(value = { BadDataException.class })
-    public ResponseEntity<RestResponse<Object>> handleBadDateException(BadDataException ne) {
+    @ExceptionHandler(value = { RequestDataException.class })
+    public ResponseEntity<RestResponse<Object>> handleBadDateException(RequestDataException ne) {
         var statusCode = HttpStatus.BAD_REQUEST.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);

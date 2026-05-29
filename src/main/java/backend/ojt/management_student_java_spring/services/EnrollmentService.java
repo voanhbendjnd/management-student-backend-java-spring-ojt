@@ -22,7 +22,7 @@ import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStat
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
-import backend.ojt.management_student_java_spring.utils.exceptions.BadDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
 import backend.ojt.management_student_java_spring.utils.exceptions.UnauthorizedException;
 import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
 import lombok.AccessLevel;
@@ -66,7 +66,7 @@ public class EnrollmentService {
         // student only enroll course 1 turn
         var isEnrolled = this.enrollmentRepository.existsByStudentUserIdAndCourseId(userId, courseId);
         if (isEnrolled) {
-            throw new BadDataException("Students have registered for this course!");
+            throw new RequestDataException("Students have registered for this course!");
         }
         // deadline enroll
         var now = LocalDateTime.now();
@@ -79,7 +79,7 @@ public class EnrollmentService {
         }
         // check slot available
         if (course.getCurrentStudents() >= course.getMaxStudents()) {
-            throw new BadDataException("The maximum number of registrations for this course has been reached!");
+            throw new RequestDataException("The maximum number of registrations for this course has been reached!");
         }
         // total redits 18/semester
         int totalCredits = this.enrollmentRepository.totalCredits(userId, course.getSemester(), course.getYear(),
@@ -101,7 +101,7 @@ public class EnrollmentService {
                 throw new AccessToResourceException("Course is full!");
             }
         } catch (DataIntegrityViolationException ex) {
-            throw new BadDataException("Already enrolled!");
+            throw new RequestDataException("Already enrolled!");
         }
 
     }
