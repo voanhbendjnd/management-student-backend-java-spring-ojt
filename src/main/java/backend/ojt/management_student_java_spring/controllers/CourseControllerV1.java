@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestCourse;
 import backend.ojt.management_student_java_spring.services.CourseService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
-import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +36,14 @@ public class CourseControllerV1 {
             var startDate = request.getEnrollEndDate();
             var now = LocalDateTime.now();
             if (endDate.isBefore(now)) {
-                throw new RequestDataException("Enroll end date before now!");
+                throw new RequestErrorException("Enroll end date before now!");
             }
             if (startDate.isAfter(endDate)) {
-                throw new RequestDataException("Enroll start date after enroll end date!");
+                throw new RequestErrorException("Enroll start date after enroll end date!");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(this.courseService.createCourse(request));
         }
-        throw new RequestDataException("Data request null!");
+        throw new RequestErrorException("Data request null!");
     }
 
 }

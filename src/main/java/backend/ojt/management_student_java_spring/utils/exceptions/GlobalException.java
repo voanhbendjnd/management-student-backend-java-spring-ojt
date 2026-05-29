@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,8 +21,8 @@ public class GlobalException {
      * @param ne
      * @return http status code 404
      **/
-    @ExceptionHandler(value = { NotFoundException.class })
-    public ResponseEntity<RestResponse<Object>> handleNotFoundException(NotFoundException ne) {
+    @ExceptionHandler(value = { ResourceNotFoundException.class })
+    public ResponseEntity<RestResponse<Object>> handleNotFoundException(ResourceNotFoundException ne) {
         var statusCode = HttpStatus.NOT_FOUND.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
@@ -35,8 +37,8 @@ public class GlobalException {
      * @param ne
      * @return http status code 409
      **/
-    @ExceptionHandler(value = { ConflictException.class })
-    public ResponseEntity<RestResponse<Object>> handleConflictException(ConflictException ne) {
+    @ExceptionHandler(value = { ConflictDataException.class })
+    public ResponseEntity<RestResponse<Object>> handleConflictException(ConflictDataException ne) {
         var statusCode = HttpStatus.CONFLICT.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
@@ -51,8 +53,8 @@ public class GlobalException {
      * @param ne
      * @return http status code 400
      **/
-    @ExceptionHandler(value = { RequestDataException.class })
-    public ResponseEntity<RestResponse<Object>> handleBadDateException(RequestDataException ne) {
+    @ExceptionHandler(value = { RequestErrorException.class })
+    public ResponseEntity<RestResponse<Object>> handleBadDateException(RequestErrorException ne) {
         var statusCode = HttpStatus.BAD_REQUEST.value();
         var res = new RestResponse<>();
         res.setStatusCode(statusCode);
@@ -117,6 +119,23 @@ public class GlobalException {
         res.setError("Forbidden");
         res.setMessage(ne.getMessage());
         return ResponseEntity.status(statusCode).body(res);
+    }
+
+    /*
+     * invalid format
+     */
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
+        @ExceptionHandler(HttpMessageNotReadableException.class)
+        public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+            var res = new RestResponse<>();
+            var statusCode = HttpStatus.BAD_REQUEST.value();
+            res.setStatusCode(statusCode);
+            res.setError("Bad request");
+            res.setMessage("Data invalid format!");
+            return ResponseEntity.status(statusCode).body(res);
+
+        }
     }
 
 }

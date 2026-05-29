@@ -10,12 +10,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import backend.ojt.management_student_java_spring.domain.dto.res.LecturerCourse;
-import backend.ojt.management_student_java_spring.domain.dto.res.ResCourse;
+import backend.ojt.management_student_java_spring.domain.dto.res.CourseProjection;
+import backend.ojt.management_student_java_spring.domain.dto.res.LecturerCourseProjection;
 import backend.ojt.management_student_java_spring.domain.entity.Course;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecificationExecutor<Course> {
+        @Query(value = "select exists(select 1 from Course c join c.lecturer l where l.userId = :lecturerId)")
+        boolean existsByLecturerId(@Param("lecturerId") Long lecturerId);
+
         boolean existsByCourseCodeIgnoreCase(String courseCode);
 
         @EntityGraph(attributePaths = { "lecturer", "lecturer.user" })
@@ -29,20 +32,23 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
          * @return
          **/
         @Query(value = """
-                        select c.id as id, c.name as name, c.description as description,
-                                c.courseCode as courseCode,
-                                c.credits as credits, c.maxStudents as maxStudents, c.semester as semester,
-                                        c.year as year, c.currentStudents as currentStudents,
-                                                c.enrollStartDate as enrollStartDate, c.enrollEndDate as enrollEndDate,
-                                        l.lecturerCode as lecturerCode, u.id as lecturerId,
-                                        u.name as lecturerName
-                                        from Course c
-                                                left join c.lecturer l
-                                                left join l.user u
-                                                where c.id = :courseId
+                        select
+                        c.id as courseId,
+                        c.name as courseName,
+                        c.description as courseDescription,
+                        c.courseCode as courseCode,
+                        c.credits as courseCredits,
+                        c.maxStudents as courseMaxStudents,
+                        c.semester as courseSemester,
+                        c.year as courseYear,
+                        c.currentStudents as courseCurrentStudents,
+                        c.enrollStartDate as courseEnrollStartDate,
+                        c.enrollEndDate as courseEnrollEndDate
+                        from Course c
+                        where c.id = :courseId
 
                         """)
-        Optional<ResCourse> findResById(@Param("courseId") Long courseId);
+        Optional<CourseProjection> findResById(@Param("courseId") Long courseId);
 
         /**
          * update course student enrollment
@@ -63,15 +69,29 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
          * @return
          **/
         @Query(value = """
-                        select c.id as id, c.name as name, c.courseCode as courseCode,
-                                        c.currentStudents as currentStudents, c.maxStudents as maxStudents,
-                                                        c.enrollStartDate as enrollStartDate, c.enrollEndDate as enrollEndDate,
-                                                                        u.gender as lecturerGender,
-                                                                        u.id as lecturerId, u.name as lecturerName, l.lecturerCode as lecturerCode, u.email as lecturerEmail
-                                                        from Course c
+                        select
+                        c.id as courseId,
+                        c.name as courseName,
+                        c.courseCode as courseCode,
+                        c.currentStudents as courseCurrentStudents,
+                        c.maxStudents as courseMaxStudents,
+                        c.enrollStartDate as courseEnrollStartDate,
+                        c.enrollEndDate as courseEnrollEndDate,
+                        c.description as courseDescription,
+                        c.credits as courseCredits,
+                        c.semester as courseSemester,
+                        c.year as courseYear,
+                        u.gender as lecturerGender,
+                        u.id as lecturerId,
+                        u.name as lecturerName,
+                        u.email as lecturerEmail,
+                        l.lecturerCode as lecturerCode,
+                        l.department as lecturerDepartment,
+                        l.academicTitle as lecturerAcademicTitle
+                        from Course c
                         join c.lecturer l
                         join l.user u
                         where c.id = :courseId
                         """)
-        Optional<LecturerCourse> findResLecturerCourseById(@Param("courseId") Long courseId);
+        Optional<LecturerCourseProjection> findResLecturerCourseById(@Param("courseId") Long courseId);
 }

@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Data response for client
- **/
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)

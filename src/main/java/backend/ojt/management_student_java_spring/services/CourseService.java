@@ -3,13 +3,13 @@ package backend.ojt.management_student_java_spring.services;
 import org.springframework.stereotype.Service;
 
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestCourse;
-import backend.ojt.management_student_java_spring.domain.dto.res.ResCourse;
+import backend.ojt.management_student_java_spring.domain.dto.res.CourseProjection;
 import backend.ojt.management_student_java_spring.domain.entity.Course;
 import backend.ojt.management_student_java_spring.repositories.CourseRepository;
 import backend.ojt.management_student_java_spring.repositories.LecturerRepository;
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
-import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
-import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,14 +20,16 @@ import lombok.experimental.FieldDefaults;
 public class CourseService {
     final CourseRepository courseRepository;
     final LecturerRepository lecturerRepository;
+
     /**
      * create course
+     * 
      * @param request
      * @return
-    **/
-    public ResCourse createCourse(RequestCourse request) {
+     **/
+    public CourseProjection createCourse(RequestCourse request) {
         if (this.courseRepository.existsByCourseCodeIgnoreCase(request.getCourseCode())) {
-            throw new RequestDataException("Course code aleary exists!");
+            throw new RequestErrorException("Course code aleary exists!");
         }
         var year = request.getEnrollStartDate().getYear();
         var month = request.getEnrollStartDate().getMonth().getValue();
@@ -36,14 +38,16 @@ public class CourseService {
         return this.toRes(this.courseRepository.save(this.toEntity(request)).getId());
 
     }
+
     /**
      * convert request to entity
+     * 
      * @param request
      * @return
-    **/
+     **/
     public Course toEntity(RequestCourse request) {
         var lecturer = this.lecturerRepository.findById(request.getLecturerId())
-                .orElseThrow(() -> new NotFoundException("Lecturer not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lecturer not found!"));
         return Course.builder()
                 .courseCode(request.getCourseCode())
                 .credits(request.getCredits())
@@ -57,20 +61,24 @@ public class CourseService {
                 .year(request.getYear())
                 .build();
     }
+
     /**
      * to response
+     * 
      * @param courseId
      * @return
-    **/
-    public ResCourse toRes(Long courseId) {
+     **/
+    public CourseProjection toRes(Long courseId) {
         return this.courseRepository.findResById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found!"));
     }
+
     /**
      * generate semester
+     * 
      * @param month
      * @return
-    **/
+     **/
     public CourseSemester getSemesterByMonth(int month) {
         return (month > 0 && month < 6) ? CourseSemester.SPRING
                 : (month > 5 && month < 9) ? CourseSemester.SUMMER

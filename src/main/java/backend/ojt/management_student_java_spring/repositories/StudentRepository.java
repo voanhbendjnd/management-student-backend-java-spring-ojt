@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import backend.ojt.management_student_java_spring.domain.entity.Student;
 import backend.ojt.management_student_java_spring.utils.constains.StudentMajor;
+import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
@@ -23,8 +24,9 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
      * @return
      **/
     @Modifying
-    @Query(value = "update Student s set s.major = :major where s.id = :studentId")
-    int updateMajorStudentById(@Param("studentId") Long studentId, @Param("major") StudentMajor major);
+    @Query(value = "update Student s set s.major = :major where s.id = :studentId and s.user.status = :status")
+    int updateMajorStudentById(@Param("studentId") Long studentId, @Param("major") StudentMajor major,
+            @Param("status") UserStatus status);
 
     /**
      * get student and user

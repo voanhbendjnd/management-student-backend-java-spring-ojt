@@ -14,6 +14,10 @@ import backend.ojt.management_student_java_spring.domain.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+
+    @Query(value = "select exists(select 1 from User u where u.email = :email)")
+    boolean existsByEmailAccount(@Param("email") String email);
+
     User findByEmailIgnoreCase(String email);
 
     /**

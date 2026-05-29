@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import backend.ojt.management_student_java_spring.domain.dto.res.LecturerCourse;
+import backend.ojt.management_student_java_spring.domain.dto.res.LecturerCourseProjection;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResReportEnroll;
 import backend.ojt.management_student_java_spring.domain.dto.res.StudentEnrollmentProjection;
 import backend.ojt.management_student_java_spring.domain.entity.Enrollment;
@@ -22,9 +22,9 @@ import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStat
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
-import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import backend.ojt.management_student_java_spring.utils.exceptions.UnauthorizedException;
-import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -51,7 +51,7 @@ public class EnrollmentService {
             throw new UnauthorizedException("Students are not logged in!");
         }
         var student = this.studentRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Student not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found!"));
         // check student role
         if (student.getUser().getRole() != UserRole.STUDENT) {
             throw new AccessToResourceException("You are not a student!");
@@ -62,11 +62,11 @@ public class EnrollmentService {
         }
         // course must exist
         var course = this.courseRepository.findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found!"));
         // student only enroll course 1 turn
         var isEnrolled = this.enrollmentRepository.existsByStudentUserIdAndCourseId(userId, courseId);
         if (isEnrolled) {
-            throw new RequestDataException("Students have registered for this course!");
+            throw new RequestErrorException("Students have registered for this course!");
         }
         // deadline enroll
         var now = LocalDateTime.now();
@@ -79,7 +79,7 @@ public class EnrollmentService {
         }
         // check slot available
         if (course.getCurrentStudents() >= course.getMaxStudents()) {
-            throw new RequestDataException("The maximum number of registrations for this course has been reached!");
+            throw new RequestErrorException("The maximum number of registrations for this course has been reached!");
         }
         // total redits 18/semester
         int totalCredits = this.enrollmentRepository.totalCredits(userId, course.getSemester(), course.getYear(),
@@ -101,7 +101,7 @@ public class EnrollmentService {
                 throw new AccessToResourceException("Course is full!");
             }
         } catch (DataIntegrityViolationException ex) {
-            throw new RequestDataException("Already enrolled!");
+            throw new RequestErrorException("Already enrolled!");
         }
 
     }
@@ -118,7 +118,8 @@ public class EnrollmentService {
         if (userId == null) {
             throw new UnauthorizedException("You are not logged in!");
         }
-        var user = this.userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!"));
+        var user = this.userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
         if (user.getRole().equals(UserRole.ADMIN) || user.getRole().equals(UserRole.LECTURER)) {
             return this.getReportForAuthorizedUser(user, courseId, pageable);
         }
@@ -136,7 +137,7 @@ public class EnrollmentService {
      **/
     private ResReportEnroll getReportForAuthorizedUser(User user, Long courseId, Pageable pageable) {
         var lecturerCourse = this.courseRepository.findResLecturerCourseById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found!"));
         if (user.getRole() == UserRole.LECTURER && !lecturerCourse.getLecturerId().equals(user.getId())) {
             throw new AccessToResourceException("You do not have permission!");
         }
@@ -151,17 +152,21 @@ public class EnrollmentService {
      * @param pageable
      * @return
      **/
-    private ResReportEnroll toResReport(LecturerCourse lecturerCourse,
+    private ResReportEnroll toResReport(LecturerCourseProjection lecturerCourse,
             Pageable pageable) {
         var res = new ResReportEnroll();
         // course
         res.setCourseCode(lecturerCourse.getCourseCode());
-        res.setCourseId(lecturerCourse.getId());
-        res.setCourseName(lecturerCourse.getName());
-        res.setCurrentStudents(lecturerCourse.getCurrentStudents());
-        res.setMaxStudents(lecturerCourse.getMaxStudents());
-        res.setEnrollStartDate(lecturerCourse.getEnrollStartDate());
-        res.setEnrollEndDate(lecturerCourse.getEnrollEndDate());
+        res.setCourseId(lecturerCourse.getCourseId());
+        res.setCourseName(lecturerCourse.getCourseName());
+        res.setCurrentStudents(lecturerCourse.getCourseCurrentStudents());
+        res.setMaxStudents(lecturerCourse.getCourseMaxStudents());
+        res.setEnrollStartDate(lecturerCourse.getCourseEnrollStartDate());
+        res.setEnrollEndDate(lecturerCourse.getCourseEnrollEndDate());
+        res.setSemester(lecturerCourse.getCourseSemester());
+        res.setCredits(lecturerCourse.getCourseCredits());
+        res.setDescription(lecturerCourse.getCourseDescription());
+        res.setYear(lecturerCourse.getCourseYear());
         // lecturer info
         var lecturerInfor = new ResReportEnroll.LecturerInfo();
         lecturerInfor.setCode(lecturerCourse.getLecturerCode());
@@ -169,9 +174,11 @@ public class EnrollmentService {
         lecturerInfor.setEmail(lecturerCourse.getLecturerEmail());
         lecturerInfor.setName(lecturerCourse.getLecturerName());
         lecturerInfor.setGender(lecturerCourse.getLecturerGender());
+        lecturerInfor.setAcademicTitle(lecturerCourse.getLecturerAcademicTitle());
+        lecturerInfor.setDepartment(lecturerCourse.getLecturerDepartment());
         res.setLecturer(lecturerInfor);
         // student enrolled
-        var page = this.enrollmentRepository.findStudentEnrollmentByCourseId(lecturerCourse.getId(),
+        var page = this.enrollmentRepository.findStudentEnrollmentByCourseId(lecturerCourse.getCourseId(),
                 EnrollmentStatus.ENROLLED,
                 pageable);
         res.setPagination(this.toPaginationResReport(pageable, page));

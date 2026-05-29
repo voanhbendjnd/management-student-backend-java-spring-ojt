@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import backend.ojt.management_student_java_spring.domain.dto.request.ImportUserRow;
+import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResImportUser;
 import backend.ojt.management_student_java_spring.domain.entity.Lecturer;
 import backend.ojt.management_student_java_spring.domain.entity.Student;
@@ -30,7 +31,8 @@ import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
-import backend.ojt.management_student_java_spring.utils.exceptions.RequestDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ConflictDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import backend.ojt.management_student_java_spring.utils.regex.UserRegex;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +53,29 @@ public class UserService {
     private static final Pattern PHONE_REGEX = Pattern.compile(UserRegex.PHONE_PATTERN);
 
     /**
+     * create lecturer account at admin
+     * 
+     * @param request
+     * @return
+     **/
+    public Long createLecturer(RequestRegister request) {
+        if (this.userRepository.existsByEmailAccount(request.getEmail().toLowerCase())) {
+            throw new ConflictDataException("Email already exist!");
+        }
+        var user = this.userRepository.save(User.builder()
+                .email(request.getEmail())
+                .gender(request.getGender())
+                .name(request.getName())
+                .password(this.passwordEncoder.encode(request.getPassword()))
+                .phone(request.getPhone())
+                .role(UserRole.LECTURER)
+                .status(UserStatus.ACTIVE)
+                .build());
+        this.lecturerService.createLecturer(user);
+        return user.getId();
+    }
+
+    /**
      * import file .xlsx include with type
      * email
      * name
@@ -67,7 +92,7 @@ public class UserService {
     @Transactional
     public ResImportUser importUsers(MultipartFile file) throws IOException, DataFormatException {
         if (file.getOriginalFilename() == null || !file.getOriginalFilename().endsWith(".xlsx")) {
-            throw new RequestDataException("File invalid, type file must be .xlsx");
+            throw new RequestErrorException("File invalid, type file must be .xlsx");
         }
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             var sheet = workbook.getSheetAt(0);

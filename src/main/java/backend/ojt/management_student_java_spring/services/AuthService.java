@@ -12,7 +12,8 @@ import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
-import backend.ojt.management_student_java_spring.utils.exceptions.NotFoundException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ConflictDataException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,11 +38,14 @@ public class AuthService {
      **/
     @Transactional
     public long register(RequestRegister request) {
+        if (this.userRepository.existsByEmailAccount(request.getEmail().toLowerCase())) {
+            throw new ConflictDataException("Email already exist!");
+        }
         var user = this.userRepository.save(User.builder()
                 .email(request.getEmail().toLowerCase())
                 .gender(request.getGender())
                 .name(request.getName())
-                .password(this.passwordEncoder.encode(request.getConfirmPassword()))
+                .password(this.passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.STUDENT)
@@ -72,7 +76,7 @@ public class AuthService {
         var refreshToken = this.securityUtils.createRefreshToken(email, res);
         var updated = this.userRepository.updateRefreshTokenByUserId(user.getId(), refreshToken);
         if (updated <= 0) {
-            throw new NotFoundException("User not found!");
+            throw new ResourceNotFoundException("User not found!");
         }
         res.setAccessToken(accessToken);
         res.setExpiresIn(expiresIn);

@@ -5,7 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
+import backend.ojt.management_student_java_spring.utils.constains.LecturerAcademicTitle;
+import backend.ojt.management_student_java_spring.utils.constains.LecturerDepartment;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,13 +29,16 @@ public class ResReportEnroll {
     Integer maxStudents;
     @JsonProperty("current_students")
     Integer currentStudents;
-    LecturerInfo lecturer;
     @JsonProperty("enroll_start_date")
     LocalDateTime enrollStartDate;
     @JsonProperty("enroll_end_date")
     LocalDateTime enrollEndDate;
+    CourseSemester semester;
+    String description;
+    Integer credits;
+    Integer year;
+    LecturerInfo lecturer;
     Pagination pagination;
-
     List<StudentEnrollment> enrollments;
 
     @Getter
@@ -61,6 +67,9 @@ public class ResReportEnroll {
         String code;
         String name;
         String email;
+        @JsonProperty("academic_title")
+        LecturerAcademicTitle academicTitle;
+        LecturerDepartment department;
         UserGender gender;
     }
 
