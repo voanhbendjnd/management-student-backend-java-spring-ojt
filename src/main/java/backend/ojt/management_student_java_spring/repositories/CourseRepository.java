@@ -2,6 +2,8 @@ package backend.ojt.management_student_java_spring.repositories;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -43,7 +45,8 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
                         c.year as courseYear,
                         c.currentStudents as courseCurrentStudents,
                         c.enrollStartDate as courseEnrollStartDate,
-                        c.enrollEndDate as courseEnrollEndDate
+                        c.enrollEndDate as courseEnrollEndDate,
+                                        c.status as courseStatus
                         from Course c
                         where c.id = :courseId
 
@@ -81,6 +84,7 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
                         c.credits as courseCredits,
                         c.semester as courseSemester,
                         c.year as courseYear,
+                        c.status as courseStatus,
                         u.gender as lecturerGender,
                         u.id as lecturerId,
                         u.name as lecturerName,
@@ -94,4 +98,23 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
                         where c.id = :courseId
                         """)
         Optional<LecturerCourseProjection> findResLecturerCourseById(@Param("courseId") Long courseId);
+
+        @Query(value = """
+                        select
+                        c.id as courseId,
+                        c.name as courseName,
+                        c.description as courseDescription,
+                        c.courseCode as courseCode,
+                        c.credits as courseCredits,
+                        c.maxStudents as courseMaxStudents,
+                        c.semester as courseSemester,
+                        c.year as courseYear,
+                        c.currentStudents as courseCurrentStudents,
+                        c.enrollStartDate as courseEnrollStartDate,
+                        c.enrollEndDate as courseEnrollEndDate,
+                                        c.status as courseStatus
+                        from Course c
+                        where lower(c.courseCode) like concat('%', :q, '%') or lower(c.name) like concat('%', :q, '%')
+                        """, countQuery = "select count(c) from Course c")
+        Page<CourseProjection> fetchAll(Pageable pageable, @Param("q") String q);
 }

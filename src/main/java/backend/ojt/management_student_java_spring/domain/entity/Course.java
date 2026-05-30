@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
+import backend.ojt.management_student_java_spring.utils.constains.CourseStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,4 +58,6 @@ public class Course extends BaseEntity {
     LocalDateTime enrollStartDate;
     @Column(nullable = false)
     LocalDateTime enrollEndDate;
+    @Enumerated(EnumType.STRING)
+    CourseStatus status;
 }

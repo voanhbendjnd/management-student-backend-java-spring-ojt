@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
+import backend.ojt.management_student_java_spring.utils.constains.CourseStatus;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerAcademicTitle;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerDepartment;
@@ -29,6 +30,8 @@ public class ResReportEnroll {
     Integer maxStudents;
     @JsonProperty("current_students")
     Integer currentStudents;
+    @JsonProperty("course_status")
+    CourseStatus courseStatus;
     @JsonProperty("enroll_start_date")
     LocalDateTime enrollStartDate;
     @JsonProperty("enroll_end_date")

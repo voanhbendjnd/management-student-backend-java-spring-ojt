@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
+import backend.ojt.management_student_java_spring.utils.constains.CourseStatus;
 
 public interface CourseProjection {
     @JsonProperty("course_id")
@@ -39,5 +40,8 @@ public interface CourseProjection {
 
     @JsonProperty("course_year")
     Integer getCourseYear();
+
+    @JsonProperty("course_status")
+    CourseStatus getCourseStatus();
 
 }

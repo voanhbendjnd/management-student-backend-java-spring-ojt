@@ -18,6 +18,7 @@ import backend.ojt.management_student_java_spring.repositories.EnrollmentReposit
 import backend.ojt.management_student_java_spring.repositories.StudentRepository;
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
+import backend.ojt.management_student_java_spring.utils.constains.CourseStatus;
 import backend.ojt.management_student_java_spring.utils.constains.EnrollmentStatus;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
@@ -63,6 +64,10 @@ public class EnrollmentService {
         // course must exist
         var course = this.courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found!"));
+        // coures opening
+        if (!course.getStatus().equals(CourseStatus.OPENING)) {
+            throw new AccessToResourceException("The course is not currently open!");
+        }
         // student only enroll course 1 turn
         var isEnrolled = this.enrollmentRepository.existsByStudentUserIdAndCourseId(userId, courseId);
         if (isEnrolled) {
@@ -158,6 +163,7 @@ public class EnrollmentService {
         // course
         res.setCourseCode(lecturerCourse.getCourseCode());
         res.setCourseId(lecturerCourse.getCourseId());
+        res.setCourseStatus(lecturerCourse.getCourseStatus());
         res.setCourseName(lecturerCourse.getCourseName());
         res.setCurrentStudents(lecturerCourse.getCourseCurrentStudents());
         res.setMaxStudents(lecturerCourse.getCourseMaxStudents());

@@ -41,5 +41,7 @@ public class RequestCourse {
     @NotNull(message = "End date null!")
     @JsonProperty("enroll_end_date")
     LocalDateTime enrollEndDate;
+    @JsonProperty("status")
+    String status;
 
 }
