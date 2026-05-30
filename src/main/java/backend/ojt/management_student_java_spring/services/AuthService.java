@@ -10,6 +10,7 @@ import backend.ojt.management_student_java_spring.domain.dto.res.ResLogin;
 import backend.ojt.management_student_java_spring.domain.entity.User;
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.ConflictDataException;
@@ -43,7 +44,7 @@ public class AuthService {
         }
         var user = this.userRepository.save(User.builder()
                 .email(request.getEmail().toLowerCase())
-                .gender(request.getGender())
+                .gender(UserGender.valueOf(request.getGender()))
                 .name(request.getName())
                 .password(this.passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())

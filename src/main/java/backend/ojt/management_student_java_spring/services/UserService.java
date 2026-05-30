@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import backend.ojt.management_student_java_spring.domain.dto.request.ImportUserRow;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
+import backend.ojt.management_student_java_spring.domain.dto.request.RequestUserInfo;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResImportUser;
 import backend.ojt.management_student_java_spring.domain.entity.Lecturer;
 import backend.ojt.management_student_java_spring.domain.entity.Student;
@@ -31,8 +32,10 @@ import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
+import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
 import backend.ojt.management_student_java_spring.utils.exceptions.ConflictDataException;
 import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
 import backend.ojt.management_student_java_spring.utils.regex.UserRegex;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -62,9 +65,10 @@ public class UserService {
         if (this.userRepository.existsByEmailAccount(request.getEmail().toLowerCase())) {
             throw new ConflictDataException("Email already exist!");
         }
+
         var user = this.userRepository.save(User.builder()
                 .email(request.getEmail())
-                .gender(request.getGender())
+                .gender(UserGender.valueOf(request.getGender()))
                 .name(request.getName())
                 .password(this.passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
@@ -73,6 +77,34 @@ public class UserService {
                 .build());
         this.lecturerService.createLecturer(user);
         return user.getId();
+    }
+
+    /**
+     * update base info user account such as name, phone, gender
+     * 
+     * @param request
+     **/
+    public void updateInfo(RequestUserInfo request) {
+        var user = this.userRepository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+
+        if (user.getStatus().equals(UserStatus.INACTIVE)) {
+            throw new AccessToResourceException("You do not have permission!");
+
+        }
+        if (request.getGender() != null) {
+            user.setGender(UserGender.valueOf(request.getGender()));
+        }
+        if (request.getName() != null && !request.getName().isBlank()) {
+            user.setName(request.getName());
+        }
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            if (!PHONE_REGEX.matcher(request.getPhone()).matches()) {
+                throw new RequestErrorException("Phone invalid format!");
+            }
+            user.setPhone(request.getPhone());
+        }
+        this.userRepository.save(user);
     }
 
     /**

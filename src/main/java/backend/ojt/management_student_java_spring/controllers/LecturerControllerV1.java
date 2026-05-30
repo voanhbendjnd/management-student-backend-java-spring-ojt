@@ -47,7 +47,7 @@ public class LecturerControllerV1 {
      * @return
      **/
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create")
+    @PostMapping
     @ApiMessage("Create account for lecturer")
     public ResponseEntity<?> createAccountLecturer(@Valid @RequestBody RequestRegister register) {
         if (register.getConfirmPassword().equals(register.getPassword())) {
@@ -140,7 +140,7 @@ public class LecturerControllerV1 {
                 throw new RequestErrorException("Gender invalid format");
             }
         }
-        this.lecturerService.updateInfoLecturer(request);
+        this.userService.updateInfo(request);
         return ResponseEntity.ok("Update info lecturer successfully!");
     }
 }

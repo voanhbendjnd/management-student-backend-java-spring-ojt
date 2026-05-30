@@ -62,4 +62,13 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, J
                         """)
         Page<StudentEnrollmentProjection> findStudentEnrollmentByCourseId(@Param("courseId") Long courseId,
                         @Param("status") EnrollmentStatus status, Pageable pageable);
+
+        /**
+         * exists student enroll course
+         * 
+         * @param studentId
+         * @return
+         **/
+        @Query(value = "select exists(select 1 from Enrollment e join e.student s where s.userId = :studentId)")
+        boolean existsByStudentId(Long studentId);
 }

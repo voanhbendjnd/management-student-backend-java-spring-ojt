@@ -1,6 +1,5 @@
 package backend.ojt.management_student_java_spring.domain.dto.request;
 
-import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

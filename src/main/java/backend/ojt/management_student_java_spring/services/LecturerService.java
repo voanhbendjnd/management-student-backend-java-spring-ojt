@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import backend.ojt.management_student_java_spring.domain.dto.request.RequestUserInfo;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResLecturer;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResultPagination;
@@ -17,7 +16,6 @@ import backend.ojt.management_student_java_spring.repositories.LecturerRepositor
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerAcademicTitle;
 import backend.ojt.management_student_java_spring.utils.constains.LecturerDepartment;
-import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
@@ -152,33 +150,6 @@ public class LecturerService {
                         this.lecturerRepository.delete(lecturer);
                         this.userRepository.delete(lecturer.getUser());
                 }
-        }
-
-        /**
-         * update base info lecturer such as name, phone, gender
-         * 
-         * @param request
-         **/
-        public void updateInfoLecturer(RequestUserInfo request) {
-                var lecturer = this.userRepository.findById(request.getId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Lecturer not found!"));
-                if (!lecturer.getRole().equals(UserRole.LECTURER)) {
-                        throw new AccessToResourceException("You do not have permission!");
-                }
-                if (lecturer.getStatus().equals(UserStatus.INACTIVE)) {
-                        throw new AccessToResourceException("You do not have permission!");
-
-                }
-                if (request.getGender() != null) {
-                        lecturer.setGender(UserGender.valueOf(request.getGender()));
-                }
-                if (request.getName() != null && !request.getName().isBlank()) {
-                        lecturer.setName(request.getName());
-                }
-                if (request.getPhone() != null && !request.getPhone().isBlank()) {
-                        lecturer.setPhone(request.getPhone());
-                }
-                this.userRepository.save(lecturer);
         }
 
 }

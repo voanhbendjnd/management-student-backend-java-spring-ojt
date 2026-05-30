@@ -17,6 +17,7 @@ import backend.ojt.management_student_java_spring.domain.dto.request.RequestAcco
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
 import backend.ojt.management_student_java_spring.services.AuthService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
+import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -42,10 +43,22 @@ public class AuthControllerV1 {
     @PostMapping("/register")
     @ApiMessage("Register account with student")
     public ResponseEntity<?> register(@Valid @RequestBody RequestRegister requestRegister) {
-        if (requestRegister.getConfirmPassword().equals(requestRegister.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(this.authService.register(requestRegister));
+
+        if (requestRegister.getGender() != null) {
+            try {
+                UserGender.valueOf(requestRegister.getGender());
+            } catch (Exception ex) {
+                throw new RequestErrorException("Gender invalid format!");
+            }
+
+            if (requestRegister.getConfirmPassword().equals(requestRegister.getConfirmPassword())) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(this.authService.register(requestRegister));
+            } else {
+                throw new RequestErrorException("Password and confirm password are not same thing");
+
+            }
         }
-        throw new RequestErrorException("Password and confirm password are not same thing");
+        throw new RequestErrorException("Gender null!");
     }
 
     /**
