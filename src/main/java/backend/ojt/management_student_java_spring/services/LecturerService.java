@@ -135,7 +135,7 @@ public class LecturerService {
         }
 
         /**
-         * delete lecturer
+         * delete lecturer and user account
          * 
          * @param id
          **/
@@ -150,6 +150,7 @@ public class LecturerService {
                                         "It is not possible to delete a lecturer who already has a course!");
                 } else {
                         this.lecturerRepository.delete(lecturer);
+                        this.userRepository.delete(lecturer.getUser());
                 }
         }
 
