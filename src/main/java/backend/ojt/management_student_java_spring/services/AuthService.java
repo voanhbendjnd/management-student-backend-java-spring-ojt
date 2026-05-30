@@ -39,11 +39,12 @@ public class AuthService {
      **/
     @Transactional
     public long register(RequestRegister request) {
-        if (this.userRepository.existsByEmailAccount(request.getEmail().toLowerCase())) {
+        var email = request.getEmail().toLowerCase();
+        if (this.userRepository.existsByEmailAccount(email)) {
             throw new ConflictDataException("Email already exist!");
         }
         var user = this.userRepository.save(User.builder()
-                .email(request.getEmail().toLowerCase())
+                .email(email)
                 .gender(UserGender.valueOf(request.getGender()))
                 .name(request.getName())
                 .password(this.passwordEncoder.encode(request.getPassword()))

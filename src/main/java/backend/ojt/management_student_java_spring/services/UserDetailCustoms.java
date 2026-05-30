@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import backend.ojt.management_student_java_spring.configs.CustomUserDetails;
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
+import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 
 @Component("userDetailsService")
 public class UserDetailCustoms implements UserDetailsService {
@@ -22,7 +23,7 @@ public class UserDetailCustoms implements UserDetailsService {
      **/
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = this.userRepository.findWithDetailByEmail(username.toLowerCase())
+        var user = this.userRepository.findWithDetailByEmail(username.toLowerCase(), UserStatus.ACTIVE)
                 .orElseThrow(() -> new UsernameNotFoundException("Username or Password incorrect!"));
         return new CustomUserDetails(user);
     }

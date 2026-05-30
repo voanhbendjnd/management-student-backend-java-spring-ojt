@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import backend.ojt.management_student_java_spring.domain.entity.User;
+import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
@@ -26,8 +27,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @param email
      * @return optional user
      **/
-    @Query(value = "select u from User u where u.email = :email")
-    Optional<User> findWithDetailByEmail(@Param("email") String email);
+    @Query(value = "select u from User u where u.email = :email and u.status = :status")
+    Optional<User> findWithDetailByEmail(@Param("email") String email, @Param("status") UserStatus status);
 
     /**
      * update refresh token with user ID
