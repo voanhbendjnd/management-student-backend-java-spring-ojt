@@ -15,6 +15,10 @@ import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    @Query(value = "select exists(select 1 from User u where u.phone = :phone)")
+    boolean existsByNumberPhone(@Param("phone") String phone);
+
+    boolean existsByPhoneAndIdNot(String phone, Long id);
 
     @Query(value = "select exists(select 1 from User u where u.email = :email)")
     boolean existsByEmailAccount(@Param("email") String email);

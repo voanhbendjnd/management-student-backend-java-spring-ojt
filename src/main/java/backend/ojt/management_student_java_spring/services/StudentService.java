@@ -79,7 +79,8 @@ public class StudentService {
 
         }
         if (!student.getUser().getRole().equals(UserRole.STUDENT)) {
-            throw new AccessToResourceException("You do not have permission!");
+            throw new RequestErrorException("Student not found!");
+            // throw new AccessToResourceException("You do not have permission!");
         }
         if (major != null) {
             student.setMajor(StudentMajor.valueOf(major));
@@ -116,6 +117,12 @@ public class StudentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found!"));
     }
 
+    /**
+     * 
+     * @param pageable
+     * @param q        search key email or student code
+     * @return
+     */
     public ResultPagination fetchAll(Pageable pageable, String q) {
         var res = new ResultPagination();
         var meta = new ResultPagination.Meta();

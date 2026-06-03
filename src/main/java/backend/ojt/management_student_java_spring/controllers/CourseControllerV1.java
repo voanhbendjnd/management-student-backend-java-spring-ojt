@@ -35,7 +35,6 @@ public class CourseControllerV1 {
     final CourseService courseService;
 
     @PreAuthorize("hasRole('ADMIN')")
-
     @PostMapping
     @ApiMessage("Create new course with lecturer ID")
     public ResponseEntity<?> createCourse(@Valid @RequestBody RequestCourse request) {

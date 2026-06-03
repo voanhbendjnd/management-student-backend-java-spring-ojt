@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -66,6 +68,9 @@ public class UserService {
         if (this.userRepository.existsByEmailAccount(email)) {
             throw new ConflictDataException("Email already exist!");
         }
+        if (this.userRepository.existsByNumberPhone(request.getPhone())) {
+            throw new ConflictDataException("Phone already exist!");
+        }
 
         var user = this.userRepository.save(User.builder()
                 .email(email)
@@ -93,6 +98,9 @@ public class UserService {
             throw new AccessToResourceException("You do not have permission!");
 
         }
+        if (!user.getRole().equals(UserRole.STUDENT)) {
+            throw new AccessToResourceException("You do not have permission!");
+        }
         if (request.getGender() != null) {
             user.setGender(UserGender.valueOf(request.getGender()));
         }
@@ -102,6 +110,9 @@ public class UserService {
         if (request.getPhone() != null && !request.getPhone().isBlank()) {
             if (!PHONE_REGEX.matcher(request.getPhone()).matches()) {
                 throw new RequestErrorException("Phone invalid format!");
+            }
+            if (this.userRepository.existsByPhoneAndIdNot(request.getPhone(), request.getId())) {
+                throw new RequestErrorException("Phone already exist!");
             }
             user.setPhone(request.getPhone());
         }
@@ -358,4 +369,46 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Export all users to excel file
+     * 
+     * @return ByteArrayInputStream
+     * @throws IOException
+     **/
+    public ByteArrayInputStream exportUsers() throws IOException {
+        List<Student> users = this.studentRepository.findAll();
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Users");
+
+            // Header
+            Row headerRow = sheet.createRow(0);
+            String[] columns = { "ID", "Email", "Name", "Phone", "Gender", "Student Code", "Credits", "Major",
+                    "Status" };
+            for (int i = 0; i < columns.length; i++) {
+                org.apache.poi.ss.usermodel.Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+            }
+
+            // Data
+            int rowIdx = 1;
+            for (Student student : users) {
+                Row row = sheet.createRow(rowIdx++);
+                var user = student.getUser();
+                row.createCell(0).setCellValue(user.getId());
+                row.createCell(1).setCellValue(user.getEmail());
+                row.createCell(2).setCellValue(user.getName());
+                row.createCell(3).setCellValue(user.getPhone() != null ? user.getPhone() : "");
+                row.createCell(4).setCellValue(user.getGender() != null ? user.getGender().name() : "");
+                row.createCell(5).setCellValue(student.getStudentCode());
+                row.createCell(6).setCellValue(student.getCountCredits());
+                row.createCell(7).setCellValue(student.getMajor() != null ? student.getMajor().name() : "");
+                // row.createCell(5).setCellValue(user.getRole() != null ? user.getRole().name()
+                // : "");
+                row.createCell(8).setCellValue(user.getStatus() != null ? user.getStatus().name() : "");
+            }
+
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+    }
 }

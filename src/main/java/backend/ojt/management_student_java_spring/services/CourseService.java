@@ -12,6 +12,7 @@ import backend.ojt.management_student_java_spring.repositories.LecturerRepositor
 import backend.ojt.management_student_java_spring.utils.constains.CourseSemester;
 import backend.ojt.management_student_java_spring.utils.constains.CourseStatus;
 import backend.ojt.management_student_java_spring.utils.exceptions.AccessToResourceException;
+import backend.ojt.management_student_java_spring.utils.exceptions.ConflictDataException;
 import backend.ojt.management_student_java_spring.utils.exceptions.RequestErrorException;
 import backend.ojt.management_student_java_spring.utils.exceptions.ResourceNotFoundException;
 import lombok.AccessLevel;
@@ -33,7 +34,8 @@ public class CourseService {
      **/
     public CourseProjection createCourse(RequestCourse request) {
         if (this.courseRepository.existsByCourseCodeIgnoreCase(request.getCourseCode())) {
-            throw new RequestErrorException("Course code aleary exists!");
+            throw new ConflictDataException("Course code already exist!");
+            // throw new RequestErrorException("Course code aleary exists!");
         }
         var year = request.getEnrollStartDate().getYear();
         var month = request.getEnrollStartDate().getMonth().getValue();

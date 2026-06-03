@@ -117,6 +117,7 @@ public class LecturerService {
          * fetch all data lecturer
          * 
          * @param pageable
+         * @Param q email or lecturer code
          * @return
          **/
         public ResultPagination fetchAll(Pageable pageable, String q) {

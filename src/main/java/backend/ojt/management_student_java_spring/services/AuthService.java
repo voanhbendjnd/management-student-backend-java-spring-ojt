@@ -43,6 +43,9 @@ public class AuthService {
         if (this.userRepository.existsByEmailAccount(email)) {
             throw new ConflictDataException("Email already exist!");
         }
+        if (this.userRepository.existsByNumberPhone(request.getPhone())) {
+            throw new ConflictDataException("Phone already exist!");
+        }
         var user = this.userRepository.save(User.builder()
                 .email(email)
                 .gender(UserGender.valueOf(request.getGender()))
