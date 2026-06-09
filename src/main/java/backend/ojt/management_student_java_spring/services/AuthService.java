@@ -32,6 +32,8 @@ import lombok.experimental.FieldDefaults;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Transactional
+
 public class AuthService {
     final UserRepository userRepository;
     final PasswordEncoder passwordEncoder;
@@ -47,7 +49,6 @@ public class AuthService {
      * @param request
      * @return
      **/
-    @Transactional
     public long register(RequestRegister request) {
         var email = request.getEmail().toLowerCase();
         if (this.userRepository.existsByEmailAccount(email)) {
@@ -100,7 +101,7 @@ public class AuthService {
 
     }
 
-    private Map<String, Object> getInfoUser(String token, String link) {
+    public Map<String, Object> getInfoUser(String token, String link) {
         RestTemplate restTemplate = new RestTemplate();
         var headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -111,32 +112,34 @@ public class AuthService {
     }
 
     public ResLogin generateUserLoginWithSocialMedia(String token, LoginWith loginWith) {
-        String email = null, name = null;
         if (loginWith.equals(LoginWith.GOOGLE)) {
             Map<String, Object> userInfo = this.getInfoUser(token, "https://www.googleapis.com/oauth2/v3/userinfo");
-            email = (String) userInfo.get("email");
-            name = (String) userInfo.get("name");
+            var email = (String) userInfo.get("email");
+             var name = (String) userInfo.get("name");
             boolean isEmailVerified = (Boolean) userInfo.get("email_verified");
             if (!isEmailVerified) {
                 throw new BadCredentialsException("Google email not verified!");
             }
             return this.handleLoginSocialMedia(email, name, loginWith);
+
+
         }
         throw new BadCredentialsException("Login failure!");
     }
 
-    private ResLogin handleLoginSocialMedia(String email, String name, LoginWith type) {
+    public ResLogin handleLoginSocialMedia(String email, String name, LoginWith type) {
         var user = userRepository.findByEmailIgnoreCase(email);
         if (user != null) {
             return this.generateLoginResponse(user);
         } else {
             var newUser = new User();
             newUser.setEmail(email);
+            newUser.setName(name);
             var encodePassword = passwordEncoder.encode(UUID.randomUUID().toString());
             newUser.setPassword(encodePassword);
             newUser.setLoginWith(type);
             newUser.setRole(UserRole.STUDENT);
-            userRepository.save(user);
+            userRepository.save(newUser);
             return this.generateLoginResponse(newUser);
         }
     }
