@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.ojt.management_student_java_spring.configs.CustomUserDetails;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestAccount;
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
+import backend.ojt.management_student_java_spring.domain.dto.request.SocialLoginDTO;
+import backend.ojt.management_student_java_spring.domain.dto.res.ResLogin;
 import backend.ojt.management_student_java_spring.services.AuthService;
 import backend.ojt.management_student_java_spring.utils.annotations.ApiMessage;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
@@ -89,5 +91,18 @@ public class AuthControllerV1 {
                 .build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(res);
 
+    }
+
+    @PostMapping("/social-login")
+    @ApiMessage("Social Login account")
+    public ResponseEntity<ResLogin> loginWithSocial(@RequestBody SocialLoginDTO dto) {
+        var res = authService.generateUserLoginWithSocialMedia(dto.getAccessToken(), dto.getType());
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", res.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(refreshTokenExpiration)
+                .build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(res);
     }
 }

@@ -1,5 +1,6 @@
 package backend.ojt.management_student_java_spring.domain.entity;
 
+import backend.ojt.management_student_java_spring.utils.constains.LoginWith;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
@@ -39,5 +40,7 @@ public class User extends BaseEntity {
     String phone;
     @Enumerated(EnumType.STRING)
     UserStatus status;
+    @Enumerated(EnumType.STRING)
+    LoginWith loginWith;
     String sessionId;
 }

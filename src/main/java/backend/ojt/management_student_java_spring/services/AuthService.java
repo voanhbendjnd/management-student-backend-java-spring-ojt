@@ -1,15 +1,25 @@
 package backend.ojt.management_student_java_spring.services;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import backend.ojt.management_student_java_spring.domain.dto.request.RequestRegister;
 import backend.ojt.management_student_java_spring.domain.dto.res.ResLogin;
 import backend.ojt.management_student_java_spring.domain.entity.User;
 import backend.ojt.management_student_java_spring.repositories.UserRepository;
 import backend.ojt.management_student_java_spring.utils.SecurityUtils;
+import backend.ojt.management_student_java_spring.utils.constains.LoginWith;
 import backend.ojt.management_student_java_spring.utils.constains.UserGender;
 import backend.ojt.management_student_java_spring.utils.constains.UserRole;
 import backend.ojt.management_student_java_spring.utils.constains.UserStatus;
@@ -88,6 +98,47 @@ public class AuthService {
         res.setRefreshToken(refreshToken);
         return res;
 
+    }
+
+    private Map<String, Object> getInfoUser(String token, String link) {
+        RestTemplate restTemplate = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.set("Accept", "application/json");
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> res = restTemplate.exchange(link, HttpMethod.GET, httpEntity, Map.class);
+        return res.getBody();
+    }
+
+    public ResLogin generateUserLoginWithSocialMedia(String token, LoginWith loginWith) {
+        String email = null, name = null;
+        if (loginWith.equals(LoginWith.GOOGLE)) {
+            Map<String, Object> userInfo = this.getInfoUser(token, "https://www.googleapis.com/oauth2/v3/userinfo");
+            email = (String) userInfo.get("email");
+            name = (String) userInfo.get("name");
+            boolean isEmailVerified = (Boolean) userInfo.get("email_verified");
+            if (!isEmailVerified) {
+                throw new BadCredentialsException("Google email not verified!");
+            }
+            return this.handleLoginSocialMedia(email, name, loginWith);
+        }
+        throw new BadCredentialsException("Login failure!");
+    }
+
+    private ResLogin handleLoginSocialMedia(String email, String name, LoginWith type) {
+        var user = userRepository.findByEmailIgnoreCase(email);
+        if (user != null) {
+            return this.generateLoginResponse(user);
+        } else {
+            var newUser = new User();
+            newUser.setEmail(email);
+            var encodePassword = passwordEncoder.encode(UUID.randomUUID().toString());
+            newUser.setPassword(encodePassword);
+            newUser.setLoginWith(type);
+            newUser.setRole(UserRole.STUDENT);
+            userRepository.save(user);
+            return this.generateLoginResponse(newUser);
+        }
     }
 
 }
